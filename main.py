@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from models import DemandCreate
-from database import DemandCreate, get_all_demands
+from models import Demanda
+from database import Demanda, get_all_demands
 
 app = FastAPI()
 
