@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Literal
 from datetime import date
 
-class DemandCreate(BaseModel):
+class Demanda (BaseModel):
     titulo: str
     descricao: str
     nome_responsavel: str
