@@ -8,6 +8,9 @@ from email_utils import enviar_email
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"mensagem": "Assistente de Demandas - API Online"}
 @app.put("/demandas/{demanda_id}/correcao")
 def solicitar_correcao(demanda_id: int, justificativa: str, novo_prazo: str, db: Session = Depends(SessionLocal)):
     demanda = db.query(Demanda).filter(Demanda.id == demanda_id).first()
