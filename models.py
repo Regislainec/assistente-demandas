@@ -1,9 +1,11 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
 
-class DemandCreate(BaseModel):
+class Demanda(BaseModel):
     titulo: str
     descricao: str
-    responsavel: str
-    email_responsavel: EmailStr
+    nome_responsavel: str
+    email_responsavel: str
+    prioridade: str
     prazo_entrega: date
+    status: str
