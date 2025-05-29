@@ -9,8 +9,7 @@ def home():
     return {"message": "API do Assistente de Demandas está no ar!"}
 
 @app.post("/demandas/")
-def criar_demanda(demanda: DemandCreate):
-    create_demand(demanda)
+def create_demand(demanda: DemandCreate):
     return {"mensagem": "Demanda criada com sucesso"}
 
 @app.get("/demandas/")
