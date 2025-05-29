@@ -1,44 +1,18 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-import os
-
 from models import DemandCreate
 from database import create_demand, get_all_demands
-from email_utils import enviar_email
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.get("/")
+def home():
+    return {"message": "API do Assistente de Demandas está no ar!"}
 
-@app.post("/demanda")
+@app.post("/demandas/")
 def criar_demanda(demanda: DemandCreate):
-    try:
-        create_demand(demanda)
-        # Alerta de prazo para o responsável
-        if demanda.email_responsavel:
-            assunto = "Nova demanda atribuída"
-            mensagem = f"""
-            Você recebeu uma nova demanda:
-            - Título: {demanda.titulo}
-            - Descrição: {demanda.descricao}
-            - Prazo para entrega: {demanda.prazo_entrega.strftime('%d/%m/%Y')}
-            """
-            enviar_email(demanda.email_responsavel, assunto, mensagem)
-        return {"mensagem": "Demanda criada com sucesso!"}
-    except Exception as e:
-        return {"erro": f"Erro ao criar demanda: {str(e)}"}
+    create_demand(demanda)
+    return {"mensagem": "Demanda criada com sucesso"}
 
-@app.get("/demandas")
+@app.get("/demandas/")
 def listar_demandas():
     return get_all_demands()
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # ← Corrigido aqui!
-    uvicorn.run(app, host="0.0.0.0", port=port)
