@@ -33,7 +33,7 @@ def create_demand(demanda: Demanda):
     conn.close()
     return {"mensagem": "Demanda criada com sucesso"}
 
-def get_all_demandas() -> List[Demanda]:
+def get_all_demands() -> List[Demanda]:
     conn = sqlite3.connect("demandas.db")
     cursor = conn.cursor()
     cursor.execute("SELECT titulo, descricao, nome_responsavel, email_responsavel, prioridade, prazo_entrega, status FROM demandas")
