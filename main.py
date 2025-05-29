@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from models import DemandCreate
-from database import create_demand, get_all_demands
+from database import DemandCreate, get_all_demands
 
 app = FastAPI()
 
@@ -9,7 +9,7 @@ def home():
     return {"message": "API do Assistente de Demandas está no ar!"}
 
 @app.post("/demandas/")
-def create_demand(demanda: DemandCreate):
+def create_demand(demanda: DDemandCreate):
     return {"mensagem": "Demanda criada com sucesso"}
 
 @app.get("/demandas/")
