@@ -1,4 +1,4 @@
-from models import DemandCreate
+from models import Demanda
 from typing import List
 import sqlite3
 
