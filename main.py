@@ -1,38 +1,44 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import os
 
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-from models import Base, Demanda
+from models import DemandCreate
+from database import create_demand, get_all_demands
 from email_utils import enviar_email
 
-Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    return {"mensagem": "Assistente de Demandas - API Online"}
-@app.put("/demandas/{demanda_id}/correcao")
-def solicitar_correcao(demanda_id: int, justificativa: str, novo_prazo: str, db: Session = Depends(SessionLocal)):
-    demanda = db.query(Demanda).filter(Demanda.id == demanda_id).first()
-    if not demanda:
-        raise HTTPException(status_code=404, detail="Demanda não encontrada")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    demanda.justificativa_correcao = justificativa
-    demanda.novo_prazo = novo_prazo
-    demanda.status = "correcao_pendente"
-    db.commit()
+@app.post("/demanda")
+def criar_demanda(demanda: DemandCreate):
+    try:
+        create_demand(demanda)
+        # Alerta de prazo para o responsável
+        if demanda.email_responsavel:
+            assunto = "Nova demanda atribuída"
+            mensagem = f"""
+            Você recebeu uma nova demanda:
+            - Título: {demanda.titulo}
+            - Descrição: {demanda.descricao}
+            - Prazo para entrega: {demanda.prazo_entrega.strftime('%d/%m/%Y')}
+            """
+            enviar_email(demanda.email_responsavel, assunto, mensagem)
+        return {"mensagem": "Demanda criada com sucesso!"}
+    except Exception as e:
+        return {"erro": f"Erro ao criar demanda: {str(e)}"}
 
-    assunto = f"[Correção solicitada] Demanda: {demanda.titulo}"
-    mensagem = f"""Olá,\n\nFoi solicitada uma correção na demanda:\n\nTítulo: {demanda.titulo}
-Justificativa: {justificativa}
-Novo prazo: {novo_prazo}\n\nPor favor, acesse o sistema e atualize a tarefa.
+@app.get("/demandas")
+def listar_demandas():
+    return get_all_demands()
 
-Att, Sistema de Demandas"""
-    enviar_email(demanda.email_responsavel, assunto, mensagem)
-    return {"message": "Correção registrada e e-mail enviado."}
 if __name__ == "__main__":
-    import uvicorn
- import os
-
-port = int(os.environ.get("PORT", 8000))
-uvicorn.run(app, host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8000))  # ← Corrigido aqui!
+    uvicorn.run(app, host="0.0.0.0", port=port)
