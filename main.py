@@ -27,3 +27,6 @@ Novo prazo: {novo_prazo}\n\nPor favor, acesse o sistema e atualize a tarefa.
 Att, Sistema de Demandas"""
     enviar_email(demanda.email_responsavel, assunto, mensagem)
     return {"message": "Correção registrada e e-mail enviado."}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=10000)
