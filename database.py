@@ -1,39 +1,50 @@
+from models import Demanda
+from typing import List
 import sqlite3
-from datetime import datetime
 
-DB_NAME = "demandas.db"
-
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
+def create_demand(demanda: Demanda):
+    conn = sqlite3.connect("demandas.db")
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS demandas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titulo TEXT NOT NULL,
+            titulo TEXT,
             descricao TEXT,
-            responsavel TEXT NOT NULL,
-            email_responsavel TEXT NOT NULL,
-            prazo_entrega DATE NOT NULL,
-            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            nome_responsavel TEXT,
+            email_responsavel TEXT,
+            prioridade TEXT,
+            prazo_entrega TEXT,
+            status TEXT
         )
     """)
-    conn.commit()
-    conn.close()
-
-def create_demand(dados):
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO demandas (titulo, descricao, responsavel, email_responsavel, prazo_entrega)
-        VALUES (?, ?, ?, ?, ?)
-    """, (dados.titulo, dados.descricao, dados.responsavel, dados.email_responsavel, dados.prazo_entrega))
+        INSERT INTO demandas (titulo, descricao, nome_responsavel, email_responsavel, prioridade, prazo_entrega, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        demanda.titulo,
+        demanda.descricao,
+        demanda.nome_responsavel,
+        demanda.email_responsavel,
+        demanda.prioridade,
+        str(demanda.prazo_entrega),
+        demanda.status
+    ))
     conn.commit()
     conn.close()
+    return {"mensagem": "Demanda criada com sucesso"}
 
-def get_all_demands():
-    conn = sqlite3.connect(DB_NAME)
+def get_all_demandas() -> List[Demanda]:
+    conn = sqlite3.connect("demandas.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM demandas")
-    results = cursor.fetchall()
+    cursor.execute("SELECT titulo, descricao, nome_responsavel, email_responsavel, prioridade, prazo_entrega, status FROM demandas")
+    rows = cursor.fetchall()
     conn.close()
-    return results
+    return [Demanda(
+        titulo=row[0],
+        descricao=row[1],
+        nome_responsavel=row[2],
+        email_responsavel=row[3],
+        prioridade=row[4],
+        prazo_entrega=row[5],
+        status=row[6]
+    ) for row in rows]
