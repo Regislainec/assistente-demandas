@@ -1,12 +1,17 @@
 from pydantic import BaseModel
-from typing import Literal
-from datetime import date
+from typing import Optional
 
-class Demanda (BaseModel):
+class Demanda(BaseModel):
     titulo: str
     descricao: str
+    prioridade: str
+    status: str
     nome_responsavel: str
     email_responsavel: str
-    prioridade: Literal["Alta", "Média", "Baixa"]
-    prazo_entrega: date
-    status: Literal["Aberta", "Em Andamento", "Concluída"]
+    solicitante: str
+    delegado: str
+    prazo_entrega: str
+    prazo_estimado: Optional[str] = None
+    data_conclusao: Optional[str] = None
+    reajuste_necessario: Optional[bool] = False
+    justificativa_reajuste: Optional[str] = None
