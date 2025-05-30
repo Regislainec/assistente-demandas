@@ -1,24 +1,22 @@
 import smtplib
 from email.mime.text import MIMEText
-from dotenv import load_dotenv
-import os
+from email.mime.multipart import MIMEMultipart
 
-load_dotenv()
+EMAIL_ADDRESS = "regislaine.grupointelli@gmail.com"
+EMAIL_PASSWORD = "Regis38201633"
 
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
-EMAIL_USER = os.getenv("EMAIL_USER", "teste@gmail.com")
-EMAIL_PASS = os.getenv("EMAIL_PASS", "senha_de_teste")
-SENDER_NAME = os.getenv("SENDER_NAME", "Assistente de Demandas")
+def enviar_email(destinatario, assunto, corpo):
+    msg = MIMEMultipart()
+    msg["From"] = EMAIL_ADDRESS
+    msg["To"] = destinatario
+    msg["Subject"] = assunto
+    msg.attach(MIMEText(corpo, "plain"))
 
-
-def enviar_email(destinatario, assunto, mensagem):
-    msg = MIMEText(mensagem)
-    msg['Subject'] = assunto
-    msg['From'] = EMAIL_USER
-    msg['To'] = destinatario
-
-    with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
-        server.starttls()
-        server.login(EMAIL_USER, EMAIL_PASS)
-        server.send_message(msg)
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.send_message(msg)
+        print("E-mail enviado com sucesso.")
+    except Exception as e:
+        print(f"Erro ao enviar e-mail: {e}")
