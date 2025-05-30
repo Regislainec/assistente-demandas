@@ -1,17 +1,13 @@
-from fastapi import FastAPI
-from models import Demanda
-from database import Demanda, get_all_demands
+from datetime import datetime, timedelta
+from database import get_all_demandas
+from email_utils import enviar_email
 
-app = FastAPI()
-
-@app.get("/")
-def home():
-    return {"message": "API do Assistente de Demandas está no ar!"}
-
-@app.post("/demandas/")
-def create_demand(demanda: Demanda):
-    return {"mensagem": "Demanda criada com sucesso"}
-
-@app.get("/demandas/")
-def listar_demandas():
-    return get_all_demands()
+def verificar_prazos():
+    hoje = datetime.now().date()
+    demandas = get_all_demandas()
+    for demanda in demandas:
+        prazo = datetime.strptime(demanda["prazo_entrega"], "%Y-%m-%d").date()
+        if prazo - hoje == timedelta(days=1):
+            assunto = "⚠️ Prazo de demanda se encerrando"
+            corpo = f"A demanda '{demanda['titulo']}' está com prazo de entrega para amanhã.\nResponsável: {demanda['responsavel']}"
+            enviar_email(demanda["email_responsavel"], assunto, corpo)
