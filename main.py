@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from database import get_all_demandas
+from database import get_all_demanda
 from email_utils import enviar_email
 
 def verificar_prazos():
     hoje = datetime.now().date()
-    demandas = get_all_demandas()
+    demandas = get_all_demanda()
     for demanda in demandas:
         prazo = datetime.strptime(demanda["prazo_entrega"], "%Y-%m-%d").date()
         if prazo - hoje == timedelta(days=1):
